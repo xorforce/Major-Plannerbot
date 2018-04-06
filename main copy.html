@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Planner Bot</title>
+</head>
+
+<link href="https://fonts.googleapis.com/css?family=Quicksand|Nunito" rel="stylesheet">
+
+<style>
+
+body{
+	background-color: #f1f1f1;
+}
+
+#demo {
+	padding-top: 150px;
+	font-size: 50px;
+	font-family: 'Quicksand', sans-serif;
+	padding-left: 250px;
+	padding-right: 250px;
+	color: black;
+	text-align: center;
+
+}
+#mode {
+	padding-top: 50px;
+	font-size: 50px;
+	font-family: 'Quicksand', sans-serif;
+	padding-left: 250px;
+	padding-right: 250px;
+	color: black;
+	text-align: center;
+
+}
+.button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    float: right;
+}
+.button:hover {
+    background-color: #3e8e41;
+}
+
+</style>
+<body>
+    <a href="#" class="button">E-Mail</a>
+    <a href="https://api.whatsapp.com/send?phone=919999082161" class="button">Whatsapp</a>
+	<p id="demo"></p>
+	<p id="mode"></p>
+
+	<script
+  src="https://code.jquery.com/jquery-1.12.4.js"
+  integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="
+  crossorigin="anonymous"></script>
+	<script type="text/javascript" src="artyom.window.min.js"></script>
+	<script>
+
+		var artyom = new Artyom();
+
+		artyom.addCommands({
+			smart:true,
+			indexes: ["*"],
+			action: function(i, wildcard) {
+				makeRequest("/input?chunk=" + wildcard);
+			}
+		});
+
+		artyom.when("SPEECH_SYNTHESIS_END", function(){ artyom.ArtyomWebkitSpeechRecognition.abort(); });
+
+		artyom.initialize({
+			lang:"en-US",
+			continuous: true,
+			listen:true,
+			speed: 1,
+			mode:"normal"
+		});
+
+		function makeRequest(link) {
+			$.getJSON( link , function( json ) {
+				artyom.say(json.response);
+				append_to_text(json.render_this);
+				append_to_input(json.response);
+			});
+		}
+
+		function append_to_text(phrase) {
+			document.getElementById("demo").innerHTML = phrase;
+		}
+		function append_to_input(phrase1) {
+			document.getElementById("mode").innerHTML = phrase1;
+		}
+
+
+	</script>
+</body>
+</html>

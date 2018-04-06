@@ -29,7 +29,7 @@ baseurl = "https://query.yahooapis.com/v1/public/yql?"
 yql_query = "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text=\"%s\")"
 
 # Google Places API
-google_api = "super secret"
+google_api = "AIzaSyArwRcZV-dbWsd42y-LGj59267D49E0WXM"
 goog_query = "https://maps.googleapis.com/maps/api/place/textsearch/json?"
 
 # Our database of activities
@@ -133,8 +133,10 @@ def parse_phrase(input_text):
 	# Try to extract missing data if its not there
 	if current_data['time'] == None:
 		current_data['time'] = get_time(input_text)
+
 	if current_data['location'] == None:
 		current_data['location'] = get_location(input_text)
+
 	if len(current_data['activities']) == 0:
 		current_data['activities'] = get_activities(input_text.lower())
 
@@ -181,12 +183,14 @@ def converse(input_chunk):
 
 	if any(greeting in input_chunk.lower().split() for greeting in greetings):
 		return 'Hi there! What can I help you with?', ""
+
 	elif any(gratitude in input_chunk.lower() for gratitude in gratitudes):
 		# resets after gratitude expressed
 		current_data = { 'time': None, 'location': None, 'activities': [] }
 		complete_input = ""
 		processed = { 'time': False, 'location': False, 'activities': False }
 		return 'No problem!', ""
+
 	elif any(reset in input_chunk.lower() for reset in resets):
 		# resets after cancellation
 		current_data = { 'time': None, 'location': None, 'activities': [] }
