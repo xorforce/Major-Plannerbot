@@ -1,21 +1,9 @@
-
-# Location
-#import spacy
-#nlp = spacy.load('en')
-
-# Get location deets
-
-import pandas as pd
 import numpy as np
 import re
+import textrazor
 from collections import Counter
-
-# Locations
-df = pd.read_csv('us_cities_states_counties.csv', delimiter="|")
-locs = []
-locs.extend(df['City'].str.title().unique())
-locs.extend(df['State full'].str.title().unique())
-locs.extend(df['County'].str.title().unique())
+import smtplib
+# from greetings import greetings as gr
 
 # Time
 import parsedatetime
@@ -24,7 +12,7 @@ from datetime import datetime
 from timex import tag_time
 
 # Yahoo Weather API
-import urllib2, urllib, json
+import urllib, json
 baseurl = "https://query.yahooapis.com/v1/public/yql?"
 yql_query = "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text=\"%s\")"
 
@@ -37,8 +25,8 @@ activities_list = json.load(open('list.json'))['all']
 activities_keys = activities_list.keys()
 
 # Messages
-
-greetings = ['hey', 'hello', 'what\'s up', 'hi']
+# greetings = gr.get_greetings()
+greetings = ['hey', 'hello', 'what\'s up', 'hi', 'hola', 'konichiwa', 'ola', 'khamma ghani']
 gratitudes = ['thanks', 'thank you']
 resets = ['stop', 'reset', 'cancel']
 
@@ -69,14 +57,6 @@ def get_time(phrase):
 		else: return None
 
 def get_location(phrase):
-	"""
-	doc = nlp(phrase, "utf-8")
-	for ent in doc.ents:
-		if ent.label_ == 'GPE':
-			print(ent.text)
-			return str(ent.text)
-	return None
-	"""
 	locs_found = []
 	formatted_phrase = phrase.title()
 	for loc in locs:
@@ -110,32 +90,61 @@ def get_weather(location, data_time):
 	# Convert date to format for Yahoo API
 	time = data_time.strftime('%d %b %Y')
 	# Get weather conditions for the day - note weather conditions do not go more than a month
-	yql_url = baseurl + urllib.urlencode({ 'q': (yql_query % location) }) + "&format=json"
-	result = urllib2.urlopen(yql_url).read()
+	yql_url = baseurl + urllib.parse.urlencode({ 'q': (yql_query % location) }) + "&format=json"
+	result = urllib.request.urlopen(yql_url).read()
 	json_result = json.loads(result)
 	if json_result['query']['count'] != 0:
 		weather_data = json_result['query']['results']['channel']['item']['forecast']
 		weather = next((item['text'] for item in weather_data if item['date'] == time), None)
-		return weather
+		print(weather)
+		return(weather)
+
 	else: return None
 
 def get_points_of_interest(place):
-	req = goog_query + urllib.urlencode({ 'query': 'attractions in ' + place, 'key': google_api })
+	req = goog_query + urllib.parse.urlencode({ 'query': 'attractions in ' + place, 'key': google_api })
 	print(req)
-	result = json.loads(urllib2.urlopen(req).read())
+	result = json.loads(urllib.request.urlopen(req).read())
 	points = [interest['name'] for interest in result['results']][0:2] # only first 2
 	return points
+
+def analysis(text_input):
+    textrazor.api_key = "fa5d3f9828d852fc40a39704d15a2b3ff5a5ec189f14e39a65a40984"
+
+    client = textrazor.TextRazor(extractors=["entities", "topics"])
+    response = client.analyze(text_input)
+
+    is_place = False
+    
+    res = {}
+
+    for entity in response.entities():
+        if ('Place' in entity.dbpedia_types):
+            res['contains_city'] = "true"
+            res['city_name'] = entity.matched_text
+            
+    for fTypes in entity.freebase_types:
+      if('sport' in fTypes):
+        res['contains_activity'] = "true"
+        res['activity_name'] = 'sport'
+    
+    return(res)
 
 ##### CREATE RESPONSE #####
 
 def parse_phrase(input_text):
+	
+	res = analysis(input_text)
 
-	# Try to extract missing data if its not there
+	# Check if it contains a City
+	if("true" in res['contains_city']):
+		current_data['location'] = res['city_name']
+
+	# if("true" in res['contains_activity']):
+	# 	current_data['activity'] = res['activity_name']
+
 	if current_data['time'] == None:
 		current_data['time'] = get_time(input_text)
-
-	if current_data['location'] == None:
-		current_data['location'] = get_location(input_text)
 
 	if len(current_data['activities']) == 0:
 		current_data['activities'] = get_activities(input_text.lower())

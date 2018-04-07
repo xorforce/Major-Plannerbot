@@ -1,69 +1,145 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>Planner Bot</title>
-</head>
+	<head>
+		<title>Planner Bot</title>
+	</head>
 
-<link href="https://fonts.googleapis.com/css?family=Quicksand|Nunito" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Quicksand|Nunito" rel="stylesheet">
 
-<style>
+	<style>
+		body{
+			background-color: #f1f1f1;
+		}
 
-body{
-	background-color: #f1f1f1;
-}
+		#demo {
+			padding-top: 150px;
+			font-size: 50px;
+			font-family: 'Quicksand', sans-serif;
+			padding-left: 250px;
+			padding-right: 250px;
+			color: black;
+			text-align: center;
+		}
 
-#demo {
-	padding-top: 150px;
-	font-size: 50px;
-	font-family: 'Quicksand', sans-serif;
-	padding-left: 250px;
-	padding-right: 250px;
-	color: black;
-	text-align: center;
+		#mode {
+			padding-top: 50px;
+			font-size: 50px;
+			font-family: 'Quicksand', sans-serif;
+			padding-left: 250px;
+			padding-right: 250px;
+			color: black;
+			text-align: center;
+		}
 
-}
+		.button {
+			background-color: #4CAF50;
+			border: none;
+			color: white;
+			padding: 15px 32px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			margin: 4px 2px;
+			cursor: pointer;
+			float: right;
+		}
 
-</style>
-<body>
+		.button:hover {
+			background-color: #3e8e41;
+		}
+	</style>
 
-	<p id="demo"></p>
+	<body>
+		<button type="button" class="button" id="button_email" disabled onclick="email()">E-Mail</button>
+		<button type="button" class="button" id="button_whatsapp" disabled onclick="whatsapp()">WhatsApp</button>
 
-	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-	<script type="text/javascript" src="artyom.window.min.js"></script>
-	<script>
+		<p id="demo"></p>
+		<p id="mode"></p>
 
-		var artyom = new Artyom();
+		<script
+			src="https://code.jquery.com/jquery-1.12.4.js"
+			integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="
+			crossorigin="anonymous">
+		</script>
+	
+		<script type="text/javascript" src="artyom.window.min.js"></script>
+	
+		<script>
+			var phrase_global;
+			var artyom = new Artyom();
 
-		artyom.addCommands({
-			smart:true,
-			indexes: ["*"],
-			action: function(i, wildcard) {
-				makeRequest("/input?chunk=" + wildcard);
-			}
-		});
-
-		artyom.when("SPEECH_SYNTHESIS_END", function(){ artyom.ArtyomWebkitSpeechRecognition.abort(); });
-
-		artyom.initialize({
-			lang:"en-US",
-			continuous: true,
-			listen:true,
-			speed: 1,
-			mode:"normal"
-		});
-
-		function makeRequest(link) {
-			$.getJSON( link , function( json ) {
-				artyom.say(json.response);
-				append_to_text(json.render_this);
+			artyom.addCommands({
+				smart:true,
+				indexes: ["*"],
+				action: function(i, wildcard) {
+					makeRequest("/input?chunk=" + wildcard);
+				}
 			});
-		}
 
-		function append_to_text(phrase) {
-			document.getElementById("demo").innerHTML = phrase;
-		}
+			artyom.when("SPEECH_SYNTHESIS_END", function(){ artyom.ArtyomWebkitSpeechRecognition.abort(); });
 
+			artyom.initialize({
+				lang:"en-US",
+				continuous: true,
+				listen:true,
+				speed: 1,
+				mode:"normal"
+			});
 
-	</script>
-</body>
+			function makeRequest(link) {
+				$.getJSON( link , function( json ) {
+					artyom.say(json.response);
+					append_to_text(json.render_this);
+					append_to_input(json.response);
+				});
+			}
+
+			function append_to_text(phrase) {
+				document.getElementById("demo").innerHTML = phrase;
+			}
+
+			function append_to_input(phrase) {
+				document.getElementById("mode").innerHTML = phrase;
+
+				if(phrase != 'Hi there! What can I help you with?'){
+					button_enable();
+
+					phrase_global = phrase;
+				}
+					
+			}
+
+			function button_enable() {
+				document.getElementById("button_email").disabled=false;
+				document.getElementById("button_whatsapp").disabled=false;
+			}
+
+			function whatsapp() {
+				var whatsapp_text = phrase_global.replace(" ", "%20");
+
+				var whatsapp_api_url = 'https://api.whatsapp.com/send?phone=';
+				var phone_num = prompt("Please enter your contact number:");
+
+				whatsapp_api_url = whatsapp_api_url + phone_num + "&text=" + whatsapp_text;
+				window.open(whatsapp_api_url);	
+			}
+
+			function email() {
+				var email_id = prompt("Please enter your email address:");
+				var message = phrase_global;
+
+				$.ajax({
+					url : '/email',
+					type : 'POST',
+					data : { 'email_id' :  email_id,
+							 'message' : message },
+					success : function(data){
+						alert("Email Sent!");
+					}
+				});
+			}
+
+		</script>
+	</body>
 </html>
