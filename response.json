@@ -1,0 +1,73 @@
+{
+    "data" : {
+        "cards" : [
+            {
+                "" : "card1",
+                "title" : "Weather",
+                "data" : {
+                    "temp" : -1,
+                    "type" : "Sunny"
+                }
+            },
+            {
+                "": "card2",
+                "title" : "Places to Visit", 
+                "data": [
+                    "",
+                    ""
+                ]
+            },
+            {
+                "": "card3", 
+                "title": "Things to Carry",
+                "data": [
+
+                ]
+            },
+            {
+                "": "card4", 
+                "title": "Hotels/FLights",
+                "data": [
+                    "TODO"
+                ]
+
+                
+            }
+        ]
+    }
+}
+
+{
+    "data" : {
+        "cards" : [
+            {
+                "" : "card1",
+                "title" : "Weather",
+                "data" : [
+
+                ]
+            },
+            {
+                "": "card2",
+                "title" : "Places to Visit", 
+                "data": [
+
+                ]
+            },
+            {
+                "": "card3", 
+                "title": "Things To Carry",
+                "data": [
+
+                ]
+            },
+            {
+                "": "card4", 
+                "title": "Gifts",
+                "data": [
+
+                ]
+            }
+        ]
+    }
+}
