@@ -86,7 +86,42 @@ def get_list(data):
 		things.extend(activities_list[activity])
 	return list(set(things))
 
+def getTimeStamp(monthName):
+	months = {"January": "01", "February": "02", "March": "03", "April": "04", "May": "05", "June": "06", "July": "07", "August": "08", "September": "09", "October": "10", "November": "11", "Devember": "12"}
+    for key, value in months.items():
+        if key == "August":
+            monthNumber = months[key]
+    time_url = "http://www.convert-unix-time.com/api?date=2017-" + monthNumber + "-01&timestamp=0"
+    print("Collecting Timezone and Timestamp")
+    result = urllib.urlopen(time_url).read()
+    data = json.loads(result)
+    timestamp = data['timestamp']
+    print("Timezone and timestamp collected")
+    return str(timestamp)
+
+def getHistoricalWeather(latitude, longitude):
+	key = "aeb17ae66d2c7eafcbce2696415e3fce/"
+	url = "https://api.darksky.net/forecast/"
+	time = getTimeStamp()
+	latitude = "28.7041"
+	longitude = "77.1025"
+	final_url = url + key + latitude + "," + longitude + "," + time
+	print("Collecting Weather")
+	result = urllib.urlopen(final_url).read()
+	data = json.loads(result)
+	print("Collected Weather, parsing..")
+	daily = data["daily"]
+	temp = daily['data'][0]['temperatureMax']
+	tempC = ((temp - 32) * 5) / 9
+	print("Done.")
+	return tempC
+	
+
 def get_weather(location, data_time):
+	
+	#TODO :- Check for historical weather
+	#getHistoricalWeather()
+	
 	# Convert date to format for Yahoo API
 	time = data_time.strftime('%d %b %Y')
 	# Get weather conditions for the day - note weather conditions do not go more than a month
