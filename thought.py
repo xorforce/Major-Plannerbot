@@ -3,6 +3,8 @@ import re
 import textrazor
 from collections import Counter
 import smtplib
+from selenium.webdriver import Firefox
+from selenium.webdriver.firefox.options import Options
 # from greetings import greetings as gr
 
 # Time
@@ -100,6 +102,7 @@ def getTimeStamp(monthName):
     return str(timestamp)
 
 def getHistoricalWeather(latitude, longitude):
+	# bhagat
 	key = "aeb17ae66d2c7eafcbce2696415e3fce/"
 	url = "https://api.darksky.net/forecast/"
 	time = getTimeStamp()
@@ -115,6 +118,41 @@ def getHistoricalWeather(latitude, longitude):
 	tempC = ((temp - 32) * 5) / 9
 	print("Done.")
 	return tempC
+
+def get_flights(source, destination):
+    import time
+
+    opts = Options()
+    opts.set_headless()
+
+    browser = Firefox(options=opts)
+    browser.get('https://www.google.com')
+
+    search_form = browser.find_element_by_id('lst-ib')
+    search_form.send_keys(source + " to " + destination + " flights")
+    search_form.submit()
+    time.sleep(3)
+
+    pq = PyQuery(browser.page_source)
+
+    tag = pq('.ADuBqd.wZSfG')
+    items = str(tag)
+    items = items.split("<span class=\"WW7zhf\">")[1:]
+
+    flights = []
+
+    for i in items:
+        f = {}
+        name = i.split('<')[0]
+        time = (str(i).split("<span class=\"hdSHM\">")[1]).split("</span>")[0]
+        price = ((str(i).split("<span class=\"JlkRud\">")[1]).split("</span>")[0]).split("from")[1].strip()
+
+        f['name'] = name
+        f['time'] = time
+        f['price'] = [price]
+        flights.append(f)
+
+    return(flights)
 	
 
 def get_weather(location, data_time):
