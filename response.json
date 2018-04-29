@@ -2,7 +2,7 @@
     "data" : {
         "cards" : [
             {
-                "" : "card1",
+                "card" : "1",
                 "title" : "Weather",
                 "data" : {
                     "temp" : -1,
@@ -10,7 +10,7 @@
                 }
             },
             {
-                "": "card2",
+                "card": "2",
                 "title" : "Places to Visit", 
                 "data": [
                     "",
@@ -18,54 +18,19 @@
                 ]
             },
             {
-                "": "card3", 
-                "title": "Things to Carry",
-                "data": [
-
-                ]
-            },
-            {
-                "": "card4", 
+                "card": "3", 
                 "title": "Hotels/FLights",
                 "data": [
-                    "TODO"
-                ]
-
-                
-            }
-        ]
-    }
-}
-
-{
-    "data" : {
-        "cards" : [
-            {
-                "" : "card1",
-                "title" : "Weather",
-                "data" : [
-
-                ]
-            },
-            {
-                "": "card2",
-                "title" : "Places to Visit", 
-                "data": [
-
-                ]
-            },
-            {
-                "": "card3", 
-                "title": "Things To Carry",
-                "data": [
-
-                ]
-            },
-            {
-                "": "card4", 
-                "title": "Gifts",
-                "data": [
-
+                    {
+                        "name" : "Vistara",
+                        "time" : "2h 5m",
+                        "price" : "Rs. 3,660"
+                    },
+                    {
+                        "name" : "Vistara",
+                        "time" : "2h 5m",
+                        "price" : "Rs. 3,660"
+                    }
                 ]
             }
         ]
