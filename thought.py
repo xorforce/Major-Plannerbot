@@ -5,6 +5,10 @@ from collections import Counter
 import smtplib
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
+from bs4 import BeautifulSoup
+from time import time
+from pyquery import PyQuery
+import requests
 # from greetings import greetings as gr
 
 # Time
@@ -38,7 +42,10 @@ intros = [ 'Wow, that sounds fun!', 'Interesting...' ]
 # initalize global vars
 global complete_input
 global processed
-global current_data
+global current_data 
+
+cards = [] 
+
 complete_input = ""
 processed = { 'time': False, 'location': False, 'activities': False }
 current_data = { 'time': None, 'location': None, 'activities': [] }
@@ -88,29 +95,28 @@ def get_list(data):
 		things.extend(activities_list[activity])
 	return list(set(things))
 
-def getTimeStamp(monthName):
-	months = {"January": "01", "February": "02", "March": "03", "April": "04", "May": "05", "June": "06", "July": "07", "August": "08", "September": "09", "October": "10", "November": "11", "Devember": "12"}
-    for key, value in months.items():
-        if key == "August":
-            monthNumber = months[key]
-    time_url = "http://www.convert-unix-time.com/api?date=2017-" + monthNumber + "-01&timestamp=0"
-    print("Collecting Timezone and Timestamp")
-    result = urllib.urlopen(time_url).read()
-    data = json.loads(result)
-    timestamp = data['timestamp']
-    print("Timezone and timestamp collected")
-    return str(timestamp)
+def getTimeStamp(month):
+	time_url = "http://www.convert-unix-time.com/api?date=2017-" + month + "-01&timestamp=0"
 
-def getHistoricalWeather(latitude, longitude):
-	# bhagat
+	print("Collecting Timezone and Timestamp")
+
+	result = urllib.request.urlopen(time_url).read()
+	data = json.loads(result)
+	timestamp = data['timestamp']
+
+	print("Timezone and timestamp collected")
+
+	return str(timestamp)
+
+def getHistoricalWeather(latitude, longitude, month):
 	key = "aeb17ae66d2c7eafcbce2696415e3fce/"
 	url = "https://api.darksky.net/forecast/"
-	time = getTimeStamp()
+	time = getTimeStamp(month)
 	latitude = "28.7041"
 	longitude = "77.1025"
 	final_url = url + key + latitude + "," + longitude + "," + time
 	print("Collecting Weather")
-	result = urllib.urlopen(final_url).read()
+	result = urllib.request.urlopen(final_url).read()
 	data = json.loads(result)
 	print("Collected Weather, parsing..")
 	daily = data["daily"]
@@ -120,39 +126,39 @@ def getHistoricalWeather(latitude, longitude):
 	return tempC
 
 def get_flights(source, destination):
-    import time
+	import time
 
-    opts = Options()
-    opts.set_headless()
+	opts = Options()
+	opts.set_headless()
 
-    browser = Firefox(options=opts)
-    browser.get('https://www.google.com')
+	browser = Firefox(options=opts)
+	browser.get('https://www.google.com')
 
-    search_form = browser.find_element_by_id('lst-ib')
-    search_form.send_keys(source + " to " + destination + " flights")
-    search_form.submit()
-    time.sleep(3)
+	search_form = browser.find_element_by_id('lst-ib')
+	search_form.send_keys(source + " to " + destination + " flights")
+	search_form.submit()
+	time.sleep(3)
 
-    pq = PyQuery(browser.page_source)
+	pq = PyQuery(browser.page_source)
 
-    tag = pq('.ADuBqd.wZSfG')
-    items = str(tag)
-    items = items.split("<span class=\"WW7zhf\">")[1:]
+	tag = pq('.ADuBqd.wZSfG')
+	items = str(tag)
+	items = items.split("<span class=\"WW7zhf\">")[1:]
 
-    flights = []
+	flights = []
 
-    for i in items:
-        f = {}
-        name = i.split('<')[0]
-        time = (str(i).split("<span class=\"hdSHM\">")[1]).split("</span>")[0]
-        price = ((str(i).split("<span class=\"JlkRud\">")[1]).split("</span>")[0]).split("from")[1].strip()
+	for i in items:
+		f = {}
+		name = i.split('<')[0]
+		time = (str(i).split("<span class=\"hdSHM\">")[1]).split("</span>")[0]
+		price = ((str(i).split("<span class=\"JlkRud\">")[1]).split("</span>")[0]).split("from")[1].strip()
 
-        f['name'] = name
-        f['time'] = time
-        f['price'] = [price]
-        flights.append(f)
+		f['name'] = name
+		f['time'] = time
+		f['price'] = price
+		flights.append(f)
 
-    return(flights)
+	return(flights)
 	
 
 def get_weather(location, data_time):
@@ -174,6 +180,18 @@ def get_weather(location, data_time):
 
 	else: return None
 
+def get_lat_long(location):
+	geocode_api = "965a3c2337904e"
+	url = "https://us1.locationiq.org/v1/search.php?key=" + geocode_api + "&q=" + location + "&format=json"
+
+	r = requests.get(url)
+
+	data = json.loads(r.text)
+	lat = (data[0]['lat'])
+	lng = (data[0]['lon'])
+	
+	return(lat, lng)
+
 def get_points_of_interest(place):
 	req = goog_query + urllib.parse.urlencode({ 'query': 'attractions in ' + place, 'key': google_api })
 	print(req)
@@ -182,45 +200,106 @@ def get_points_of_interest(place):
 	return points
 
 def analysis(text_input):
-    textrazor.api_key = "fa5d3f9828d852fc40a39704d15a2b3ff5a5ec189f14e39a65a40984"
+	textrazor.api_key = "fa5d3f9828d852fc40a39704d15a2b3ff5a5ec189f14e39a65a40984"
 
-    client = textrazor.TextRazor(extractors=["entities", "topics"])
-    response = client.analyze(text_input)
+	client = textrazor.TextRazor(extractors=["entities", "topics"])
+	response = client.analyze(text_input)
 
-    is_place = False
-    
-    res = {}
+	is_place = False
+	
+	res = {}
 
-    for entity in response.entities():
-        if ('Place' in entity.dbpedia_types):
-            res['contains_city'] = "true"
-            res['city_name'] = entity.matched_text
-            
-    for fTypes in entity.freebase_types:
-      if('sport' in fTypes):
-        res['contains_activity'] = "true"
-        res['activity_name'] = 'sport'
-    
-    return(res)
+	if(len(response.entities())>0):
+		for entity in response.entities():
+			if ('Place' in entity.dbpedia_types):
+				res['contains_city'] = "true"
+				res['city_name'] = entity.matched_text
+				
+		for fTypes in entity.freebase_types:
+			if('sport' in fTypes):
+
+				res['contains_activity'] = "true"
+				res['activity_name'] = 'sport'
+	
+	return(response, res)
 
 ##### CREATE RESPONSE #####
 
 def parse_phrase(input_text):
+
+	future_weather = False
+	tempC = ""
+	lat = ""
+	lng = ""
+	card = {}
 	
-	res = analysis(input_text)
+	response, res = analysis(input_text)
 
 	# Check if it contains a City
-	if("true" in res['contains_city']):
+	if("contains_city" in res):
 		current_data['location'] = res['city_name']
 
 	# if("true" in res['contains_activity']):
 	# 	current_data['activity'] = res['activity_name']
 
-	if current_data['time'] == None:
+	if "time" not in current_data:
 		current_data['time'] = get_time(input_text)
 
-	if len(current_data['activities']) == 0:
+	if "activities" not in current_data:
 		current_data['activities'] = get_activities(input_text.lower())
+
+	
+	######## Card 1 : Weather Data ########
+	# Check if Historic Weather to be fetched 
+	print("Building Card 1")
+	for e in response.entities():
+		if 'Time' in e.dbpedia_types:
+			future_weather = True
+			month = str(e.id).split("-")[1]
+			lat, lng = get_lat_long(current_data['location'])
+			tempC = getHistoricalWeather(lat, lng, month)
+			weather_type = get_weather(current_data['location'], current_data['time']['time'])
+
+			#Create and Append Card
+			card["card"] = "1"
+			card["title"] = "weather"
+
+			data = {"temp" : tempC, "type" : weather_type}
+			card["data"] = data
+
+			cards.append(card)
+			print("Done")
+
+	######## Card 2 : Place of Interest ########
+	print("Building Card 2")
+	card = {}
+	card["card"] = "2"
+	card["title"] = "Places to Visit"
+	card["data"] = get_points_of_interest(current_data['location'])
+	cards.append(card)
+	print("Done")
+
+	######## Card 3 : Flight Details ########
+	print("Building Card 3")
+	card = {}
+	card["card"] = "3"
+	card["title"] = "Flights"
+
+	flights = get_flights("Delhi", current_data['location'])
+
+	if(len(flights)>0): # WGJK WGJF
+		card["data"] = flights[:3]
+
+	cards.append(card)
+	print("Done")
+
+	final_data = {"data" : cards}
+
+	print("\n"*3, "Hat Jaayo Saare", "\n"*3)
+	print(final_data)
+
+	if(future_weather is False):
+		weather = get_weather(current_data['location'], current_data['time']['time'])
 
 	response = ""
 
@@ -281,6 +360,8 @@ def converse(input_chunk):
 		return 'Cancelled', ""
 	else:
 		complete_input = complete_input + input_chunk
+		current_data = {"data" : None}
+		input_chunk = input_chunk.title()
 		return parse_phrase(input_chunk)
 
 # END
