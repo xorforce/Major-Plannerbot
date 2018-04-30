@@ -1,93 +1,118 @@
-<!DOCTYPE html>
 <html>
-	<head>
-		<title>Planner Bot</title>
-	</head>
+    <head>
+        <link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/static/SEM_CSS/semantic.css">
+        <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+        <style type="text/css">
+        	html{
+        		font-family: 'Josefin Sans', sans-serif !important;	
+        	}
+            body {
+              background-color: #FFFFFF;
+              font-family: 'Josefin Sans', sans-serif !important;
+            }
+            .ui.menu .item img.logo {
+              margin-right: 1.5em;
+            }
+            .main.container {
+              margin-top: 7em;
+            }
+            .wireframe {
+              margin-top: 2em;
+            }
+            .ui.footer.segment {
+              margin: 5em 0em 0em;
+              padding: 5em 0em;
+            }
+    		.button {
+				background-color: #4CAF50;
+				border: none;
+				color: white;
+				padding: 15px 32px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 16px;
+				margin: 4px 2px;
+				cursor: pointer;
+				float: right;
+			}
 
-	<link href="https://fonts.googleapis.com/css?family=Quicksand|Nunito" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.css">
-	<style>
+			.button:hover {
+				background-color: #3e8e41;
+			}
+            </style>
+    </head>
+    <body>
+                 
+                  <div class="ui grid centered">
 
-		#demo {
-			padding-top: 150px;
-			font-size: 50px;
-			font-family: 'Quicksand', sans-serif;
-			padding-left: 250px;
-			padding-right: 250px;
-			color: black;
-			text-align: center;
-		}
+                  	<div class="row centered" style="padding: 40px;">
+                    	<h1>PlannerBot</h1>
+                  	</div>
+                    <div style="background-color: #FFFFFF; margin-top:40px;" class="fourteen wide column">
+                            <div class="ui center aligned segment" style="height: 35vh;">
+                                    <h2 class="ui icon header">
+                                            <i class="microphone icon" onclick="initArtyom()"></i>
+                                            <div class="content" id="response">
+                                              Click on the Icon and start speaking
+                                              <div class="sub header">I will compile your voice on this device only, Privacy You know.</div>
+                                            </div>
+                                          </h2>
+                            </div>
+                    </div>
+                    </div>
+                    <div class="ui grid">
+                        <div class="left floated row centered" style="background-color: #EFEFEF;">
+                            <!-- <div class="twelve wide column"> -->
+                                    <h1 >Results</h1>
+                            <!-- </div>     -->
+                            
+                        </div>it
+                        <div class="row centered" id="auction" style="background-color: #FFFFFF;">
+                            <!--<div  class="four wide column" rv-each-todo="data">
+                                    <div class="ui cards">
+                                            <div class="card">
+                                              <div class="content">
+                                                <img class="right floated mini ui image" src="https://ui-avatars.com/api/?name=Flights&background=0D8ABC&color=fff">
+                                                <div class="header">
+                                                  Elliot Fu
+                                                </div>
+                                                <div class="meta">
+                                                  Friends of Veronika
+                                                </div>
+                                                <div class="description">
+                                                  Elliot requested permission to view your contact details
+                                                </div>
+                                              </div>
+                                              <div class="extra content">
+                                                    <div class="ui fluid green button">Approve</div>
+                                                </div>
+                                            </div>
+                                    </div>
+                            </div>!-->
+                        </div>
 
-		#mode {
-			padding-top: 50px;
-			font-size: 50px;
-			font-family: 'Quicksand', sans-serif;
-			padding-left: 250px;
-			padding-right: 250px;
-			color: black;
-			text-align: center;
-		}
+                        <div class="row centered">
+                        	<h2>Share this Information</h2>
+                    	</div>
 
-		.button {
-			background-color: #4CAF50;
-			border: none;
-			color: white;
-			padding: 15px 32px;
-			text-align: center;
-			text-decoration: none;
-			display: inline-block;
-			font-size: 16px;
-			margin: 4px 2px;
-			cursor: pointer;
-			float: right;
-		}
-
-		.button:hover {
-			background-color: #3e8e41;
-		}
-	</style>
-
-	<body>
-		<div class="ui text menu">
-  <div class="item">
-    <img src="/images/new-school.jpg">
-  </div>
-  <a class="browse item">
-    Browse Courses
-    <i class="dropdown icon"></i>
-  </a>
-  <div class="ui right dropdown item">
-    More
-    <i class="dropdown icon"></i>
-    <div class="menu">
-      <div class="item">Applications</div>
-      <div class="item">International Students</div>
-      <div class="item">Scholarships</div>
-    </div>
-  </div>
-</div>
-<div class="ui flowing basic admission popup">
-  <div class="ui three column relaxed divided grid">
-    
-
-  </div>
-</div>
-
-		<button type="button" class="button" id="button_email" disabled onclick="email()">E-Mail</button>
-		<button type="button" class="button" id="button_whatsapp" disabled onclick="whatsapp()">WhatsApp</button>
-
-		<p id="demo"></p>
-		<p id="mode"></p>
-
-		<script
-			src="https://code.jquery.com/jquery-1.12.4.js"
-			integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="
-			crossorigin="anonymous">
-		</script>
-	
-		<script type="text/javascript" src="artyom.window.min.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.js"></script>
-		<script>
+            			<div class="left floated row centered">
+            				<button type="button" class="button" id="button_email" disabled onclick="email()">E-Mail</button>
+						<button type="button" class="button" id="button_whatsapp" disabled onclick="whatsapp()">WhatsApp</button>
+            			</div>
+                    </div>
+                        
+                
+    </body>
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+    <script type="text/javascript" src="artyom.window.min.js"></script>
+    <script src="/static/SEM_CSS/semantic.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rivets/0.9.6/rivets.bundled.min.js"></script>
+    <script>
 			var phrase_global;
 			var artyom = new Artyom();
 
@@ -95,13 +120,18 @@
 				smart:true,
 				indexes: ["*"],
 				action: function(i, wildcard) {
-					makeRequest("/input?chunk=" + wildcard);
+					if(wildcard.length>10){
+						makeRequest("/input?chunk=" + wildcard,true);						
+					}else{
+						makeRequest("/input?chunk=" + wildcard,false);
+					}
+
 				}
 			});
 
 			artyom.when("SPEECH_SYNTHESIS_END", function(){ artyom.ArtyomWebkitSpeechRecognition.abort(); });
-
-			artyom.initialize({
+    function initArtyom(){
+        artyom.initialize({
 				lang:"en-US",
 				continuous: true,
 				listen:true,
@@ -109,21 +139,65 @@
 				mode:"normal"
 			});
 
-			function makeRequest(link) {
+    }
+    function renderCard(data){
+    	_div=$('<div>');
+    	_div.addClass('four wide column');
+    		_uidiv=$('<div>');
+    		_uidiv.addClass('ui cards');
+    		_divCards=$('<div>');
+    		_divCards.addClass('card');
+    			_contentDiv=$('<div>');
+    			_contentDiv.addClass('content')
+    				_imgTag=$('<img>');
+    				_imgTag.addClass('right floated mini ui image');
+    				_imgTag.attr('src','https://ui-avatars.com/api/?name='+data.title+'&background=0D8ABC&color=fff');
+    				_divheader=$('<div>');
+    				_divheader.addClass('header');
+    				_divheader.text(data.title);
+    				_metaTag=$('<div>');
+    				_metaTag.addClass('meta');
+    				_metaTag.text(data.description);
+    				_descriptionDiv=$('<div>');
+    				_descriptionDiv.addClass('description');
+    				_descriptionDiv.html(data.content).wrap('<pre>');
+    			_contentDiv.append(_imgTag);
+    			_contentDiv.append(_divheader);
+    			_contentDiv.append(_metaTag);
+    			_contentDiv.append(_descriptionDiv);
+    			_extraContent=$('<div>');
+    			_extraContent.addClass('extra content');
+    				_button=$('<div>');
+    				_button.addClass('ui fluid green button');
+    				_button.text("ACTION");
+    			_extraContent.append(_button);
+    		_divCards.append(_contentDiv);
+    		// _divCards.append(_extraContent);
+    		_uidiv.append(_divCards);
+    		_div.append(_uidiv);
+    	$('#auction').append(_div);
+    }
+    var results;
+			function makeRequest(link,flag) {
+				$('#response').text("Loading,  Please Wait...");
+				(flag)?artyom.fatality():'';
 				$.getJSON( link , function( json ) {
 					artyom.say(json.response);
 					// append_to_text(json.render_this);
-					console.log(json.finalData)
+					results=json.finalData.data;
+					results.map((item,index)=>{
+				    	renderCard(item);
+				    })
 					append_to_input(json.response);
 				});
 			}
 
 			function append_to_text(phrase) {
-				document.getElementById("demo").innerHTML = phrase;
+				document.getElementById("response").innerHTML = phrase;
 			}
 
 			function append_to_input(phrase) {
-				document.getElementById("mode").innerHTML = phrase;
+				document.getElementById("response").innerHTML = phrase;
 
 				if(phrase != 'Hi there! What can I help you with?'){
 					button_enable();
@@ -162,7 +236,5 @@
 					}
 				});
 			}
-
 		</script>
-	</body>
 </html>
