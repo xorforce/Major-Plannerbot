@@ -12,8 +12,8 @@ from thought import converse
 def recieve_input():
 	print('GOT REQUEST! ' + request.args.get('chunk'))
 	input_chunk = request.args.get('chunk')
-	response, render_this = converse(input_chunk)
-	return jsonify(response=response, render_this=render_this)
+	response, final_data = converse(input_chunk)
+	return jsonify(response=response, finalData=final_data)
 
 @app.route('/email', methods = ['GET', 'POST'])
 def handle_email():

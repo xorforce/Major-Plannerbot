@@ -250,25 +250,34 @@ def parse_phrase(input_text):
 
 	
 	######## Card 1 : Weather Data ########
-	# Check if Historic Weather to be fetched 
+	month_text = ""
+	month = ""
+
+	calender = {"01" : "January", "02" : "February", "03": "March", "04" : "April", "05" : "May", "06" : "June", "07" : "July", "08" : "August", "09":"September", "10":"October", "11" : "Movember", "12":"December"}
+	
 	print("Building Card 1")
 	for e in response.entities():
 		if 'Time' in e.dbpedia_types:
-			future_weather = True
 			month = str(e.id).split("-")[1]
-			lat, lng = get_lat_long(current_data['location'])
-			tempC = getHistoricalWeather(lat, lng, month)
-			weather_type = get_weather(current_data['location'], current_data['time']['time'])
+		else:
+			month = "05"
 
-			#Create and Append Card
-			card["card"] = "1"
-			card["title"] = "weather"
+	month_text = calender[month]
+	lat, lng = get_lat_long(current_data['location'])
+	tempC = getHistoricalWeather(lat, lng, month)
+	tempC = str(round(tempC, 2) ) + " °C"
+	weather_type = get_weather(current_data['location'], current_data['time']['time'])
 
-			data = {"temp" : tempC, "type" : weather_type}
-			card["data"] = data
+	#Create and Append Card
+	card["card"] = "1"
+	card["title"] = "weather"
+	card["month"] = month_text
 
-			cards.append(card)
-			print("Done")
+	data = {"temp" : tempC, "type" : weather_type}
+	card["data"] = data
+
+	cards.append(card)
+	print("Done")
 
 	######## Card 2 : Place of Interest ########
 	print("Building Card 2")
@@ -297,9 +306,6 @@ def parse_phrase(input_text):
 
 	print("\n"*3, "Hat Jaayo Saare", "\n"*3)
 	print(final_data)
-
-	if(future_weather is False):
-		weather = get_weather(current_data['location'], current_data['time']['time'])
 
 	response = ""
 
@@ -333,7 +339,7 @@ def parse_phrase(input_text):
 			render_this = render_this.replace(activity,  
 				"<span style=\"color: #0000FF;\">%s</span>" % activity)
 
-	return response, render_this
+	return response, final_data
 
 ##### ENTRY AND EXIT POINT #####
 

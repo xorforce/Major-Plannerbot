@@ -5,11 +5,8 @@
 	</head>
 
 	<link href="https://fonts.googleapis.com/css?family=Quicksand|Nunito" rel="stylesheet">
-
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.css">
 	<style>
-		body{
-			background-color: #f1f1f1;
-		}
 
 		#demo {
 			padding-top: 150px;
@@ -51,6 +48,31 @@
 	</style>
 
 	<body>
+		<div class="ui text menu">
+  <div class="item">
+    <img src="/images/new-school.jpg">
+  </div>
+  <a class="browse item">
+    Browse Courses
+    <i class="dropdown icon"></i>
+  </a>
+  <div class="ui right dropdown item">
+    More
+    <i class="dropdown icon"></i>
+    <div class="menu">
+      <div class="item">Applications</div>
+      <div class="item">International Students</div>
+      <div class="item">Scholarships</div>
+    </div>
+  </div>
+</div>
+<div class="ui flowing basic admission popup">
+  <div class="ui three column relaxed divided grid">
+    
+
+  </div>
+</div>
+
 		<button type="button" class="button" id="button_email" disabled onclick="email()">E-Mail</button>
 		<button type="button" class="button" id="button_whatsapp" disabled onclick="whatsapp()">WhatsApp</button>
 
@@ -64,7 +86,7 @@
 		</script>
 	
 		<script type="text/javascript" src="artyom.window.min.js"></script>
-	
+		<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.1/dist/semantic.min.js"></script>
 		<script>
 			var phrase_global;
 			var artyom = new Artyom();
@@ -90,7 +112,8 @@
 			function makeRequest(link) {
 				$.getJSON( link , function( json ) {
 					artyom.say(json.response);
-					append_to_text(json.render_this);
+					// append_to_text(json.render_this);
+					console.log(json.finalData)
 					append_to_input(json.response);
 				});
 			}
